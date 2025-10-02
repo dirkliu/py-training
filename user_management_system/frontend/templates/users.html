@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>用户管理系统 - 用户信息管理</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>用户管理系统</h1>
+            <div class="user-info">
+                <span>欢迎，{{ current_user.username }}</span>
+                <a href="{{ url_for('logout') }}" class="btn-logout">退出登录</a>
+            </div>
+        </header>
+        
+        <nav class="sidebar">
+            <ul>
+                <li><a href="{{ url_for('dashboard') }}">仪表盘</a></li>
+                <li><a href="{{ url_for('users') }}">用户管理</a></li>
+                <li><a href="{{ url_for('logs') }}">日志看板</a></li>
+            </ul>
+        </nav>
+        
+        <main class="content">
+            <h2>用户信息管理</h2>
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    <div class="flash-messages">
+                        {% for message in messages %}
+                            <div class="flash-message">{{ message }}</div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% endwith %}
+            
+            <div class="user-table-container">
+                <table class="user-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>用户名</th>
+                            <th>上次登录IP</th>
+                            <th>登录状态</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for user in users %}
+                        <tr>
+                            <td>{{ user.id }}</td>
+                            <td>{{ user.username }}</td>
+                            <td>{{ user.last_login_ip or '无' }}</td>
+                            <td>
+                                {% if user.is_logged_in %}
+                                    <span class="status-online">在线</span>
+                                {% else %}
+                                    <span class="status-offline">离线</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <button class="btn-reset-password" data-user-id="{{ user.id }}">重置密码</button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+    
+    <!-- 重置密码模态框 -->
+    <div id="reset-password-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h3>重置密码</h3>
+            <form id="reset-password-form" method="POST">
+                <input type="hidden" id="reset-user-id" name="user_id">
+                <div class="form-group">
+                    <label for="new-password">新密码：</label>
+                    <input type="password" id="new-password" name="new_password" required>
+                </div>
+                <button type="submit" class="btn-confirm">确认</button>
+            </form>
+        </div>
+    </div>
+    
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>

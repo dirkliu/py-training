@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>用户管理系统 - 日志看板</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>用户管理系统</h1>
+            <div class="user-info">
+                <span>欢迎，{{ current_user.username }}</span>
+                <a href="{{ url_for('logout') }}" class="btn-logout">退出登录</a>
+            </div>
+        </header>
+        
+        <nav class="sidebar">
+            <ul>
+                <li><a href="{{ url_for('dashboard') }}">仪表盘</a></li>
+                <li><a href="{{ url_for('users') }}">用户管理</a></li>
+                <li><a href="{{ url_for('logs') }}">日志看板</a></li>
+            </ul>
+        </nav>
+        
+        <main class="content">
+            <h2>用户日志看板</h2>
+            
+            <div class="log-table-container">
+                <table class="log-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>用户名</th>
+                            <th>登录IP</th>
+                            <th>登录时间</th>
+                            <th>下线时间</th>
+                            <th>会话时长</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for log in logs %}
+                        <tr>
+                            <td>{{ log.id }}</td>
+                            <td>{{ log.username }}</td>
+                            <td>{{ log.login_ip }}</td>
+                            <td>{{ log.login_time.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                            <td>
+                                {% if log.logout_time %}
+                                    {{ log.logout_time.strftime('%Y-%m-%d %H:%M:%S') }}
+                                {% else %}
+                                    <span class="status-active">活跃中</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if log.logout_time %}
+                                    {{ ((log.logout_time - log.login_time).total_seconds() / 60)|round(2) }} 分钟
+                                {% else %}
+                                    - 
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>
